@@ -26,23 +26,3 @@ func GetUserByID(id uint) (*User, error) {
 func (u *User) CreateUser() error {
 	return stores.GetDb().Create(u).Error
 }
-
-func (u *User) Follow(followedUser *User) error {
-	err := stores.GetDb().Model(u).Association("Following").Append(&followedUser)
-	if err != nil {
-		return err
-	}
-	// Update the followed user's followers list
-	err = stores.GetDb().Model(&followedUser).Association("Followers").Append(u)
-	return err
-}
-
-func (u *User) Unfollow(followedUser *User) error {
-	err := stores.GetDb().Model(u).Association("Following").Delete(&followedUser)
-	if err != nil {
-		return err
-	}
-	// Update the followed user's followers list
-	err = stores.GetDb().Model(&followedUser).Association("Followers").Delete(u)
-	return err
-}
