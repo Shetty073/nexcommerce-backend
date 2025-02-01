@@ -9,13 +9,13 @@ import (
 )
 
 type MarketingCampaign struct {
-	ID             uuid.UUID  `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	ID             uuid.UUID  `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	Name           string     `gorm:"type:varchar(100);not null;index"`
 	Description    string     `gorm:"type:varchar(1000)"`
 	HasStoreBanner bool       `gorm:"type:boolean;default:false;index"`
 	StoreBannerImg string     `gorm:"type:varchar(1024)"`
-	StartDate      string     `gorm:"type:datetime;not null;index"`
-	EndDate        string     `gorm:"type:datetime;not null;index"`
+	StartDate      string     `gorm:"type:timestamptz;not null;index"`
+	EndDate        string     `gorm:"type:timestamptz;not null;index"`
 	ProductID      uuid.UUID  `gorm:"type:uuid;not null;index"`
 	CreatedByID    uuid.UUID  `gorm:"type:uuid;not null;index"`
 	UpdatedByID    uuid.UUID  `gorm:"type:uuid;index"`

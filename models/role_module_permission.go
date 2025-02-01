@@ -9,7 +9,7 @@ import (
 )
 
 type RoleModulePermission struct {
-	ID           uuid.UUID  `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	ID           uuid.UUID  `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	RoleID       uuid.UUID  `gorm:"type:uuid;not null;index"` // Foreign key for RoleID
 	ModuleID     uuid.UUID  `gorm:"type:uuid;not null;index"` // Foreign key for ModuleID
 	PermissionID uuid.UUID  `gorm:"type:uuid;not null;index"` // Foreign key for PermissionID

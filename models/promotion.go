@@ -9,7 +9,7 @@ import (
 )
 
 type Promotion struct {
-	ID           uuid.UUID  `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	ID           uuid.UUID  `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	Code         string     `gorm:"type:varchar(10);not null;index"`
 	DiscountRate float64    `gorm:"type:decimal"`
 	DiscountFlat float64    `gorm:"type:decimal"`

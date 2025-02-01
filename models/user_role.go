@@ -9,7 +9,7 @@ import (
 )
 
 type UserRole struct {
-	ID        uuid.UUID  `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	ID        uuid.UUID  `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	UserID    uuid.UUID  `gorm:"type:uuid;not null;index"` // Foreign key for UserID
 	RoleID    uuid.UUID  `gorm:"type:uuid;not null;index"` // Foreign key for RoleID
 	CreatedAt *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`

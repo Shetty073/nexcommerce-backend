@@ -11,8 +11,8 @@ import (
 )
 
 type PurchaseOrder struct {
-	ID          uuid.UUID                 `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
-	OrderAt     sql.NullTime              `gorm:"type:datetime;not null;index"`
+	ID          uuid.UUID                 `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
+	OrderAt     sql.NullTime              `gorm:"type:timestamptz;not null;index"`
 	Status      enums.PurchaseOrderStatus `gorm:"type:varchar(15);index"`
 	NoOfUnits   int                       `gorm:"type:int;not null"`
 	CostPerUnit float64                   `gorm:"type:decimal;not null"`

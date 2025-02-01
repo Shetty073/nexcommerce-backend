@@ -9,7 +9,7 @@ import (
 )
 
 type Supplier struct {
-	ID          uuid.UUID  `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	ID          uuid.UUID  `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	Name        string     `gorm:"type:varchar(100);not null;index"`
 	Description string     `gorm:"type:varchar(250)"`
 	Phone       string     `gorm:"type:varchar(15);index"`

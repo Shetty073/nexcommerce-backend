@@ -9,7 +9,7 @@ import (
 )
 
 type Currency struct {
-	ID                  uuid.UUID  `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	ID                  uuid.UUID  `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	Name                string     `gorm:"type:varchar(20);not null;index"`
 	Symbol              string     `gorm:"type:varchar(5);index"`
 	ShortCode           string     `gorm:"type:varchar(5);index"`

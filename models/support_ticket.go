@@ -10,7 +10,7 @@ import (
 )
 
 type SupportTicket struct {
-	ID               uuid.UUID                    `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	ID               uuid.UUID                    `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	IssueType        enums.SupportTicketIssueType `gorm:"type:varchar(15);index"`
 	IssueDescription string                       `gorm:"type:varchar(500);not null"`
 	Status           enums.SupportTicketStatus    `gorm:"type:varchar(15);index"`

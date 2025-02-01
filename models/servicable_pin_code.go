@@ -9,7 +9,7 @@ import (
 )
 
 type ServicablePinCode struct {
-	ID           uuid.UUID  `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	ID           uuid.UUID  `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	PinCode      string     `gorm:"type:varchar(10);not null;unique;index"`
 	Country      string     `gorm:"type:varchar(100);index"`
 	IsServicable bool       `gorm:"default:false"`

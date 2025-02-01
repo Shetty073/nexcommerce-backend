@@ -9,7 +9,7 @@ import (
 )
 
 type TicketNote struct {
-	ID          uuid.UUID  `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	ID          uuid.UUID  `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	UpdateNote  string     `gorm:"type:varchar(1000)"`
 	Image1      string     `gorm:"type:varchar(1024)"`
 	Image2      string     `gorm:"type:varchar(1024)"`

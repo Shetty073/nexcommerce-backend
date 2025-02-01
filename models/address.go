@@ -9,7 +9,7 @@ import (
 )
 
 type Address struct {
-	ID        uuid.UUID  `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	ID        uuid.UUID  `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	Line1     string     `gorm:"type:varchar(100);not null"`
 	Line2     string     `gorm:"type:varchar(100)"`
 	Line3     string     `gorm:"type:varchar(100)"`

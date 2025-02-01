@@ -9,7 +9,7 @@ import (
 )
 
 type Inventory struct {
-	ID                uuid.UUID  `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	ID                uuid.UUID  `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	Name              string     `gorm:"type:varchar(150);not null;index"`
 	Description       string     `gorm:"type:varchar(250)"`
 	StockLevel        int        `gorm:"type:int;not null;index"`

@@ -10,7 +10,7 @@ import (
 )
 
 type ProductMedia struct {
-	ID          uuid.UUID              `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	ID          uuid.UUID              `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	File        string                 `gorm:"type:varchar(1024);not null"`
 	Type        enums.ProductMediaType `gorm:"type:varchar(15);index"`
 	Description string                 `gorm:"type:varchar(20)"`

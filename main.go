@@ -2,11 +2,9 @@ package main
 
 import (
 	"nexcommerce/middlewares"
-	"nexcommerce/models"
 	"nexcommerce/responses"
 	"nexcommerce/routes/auth"
 	v1 "nexcommerce/routes/v1"
-	"nexcommerce/stores"
 	"nexcommerce/utils/config"
 	"nexcommerce/utils/logger"
 	"nexcommerce/utils/migrations"
@@ -33,9 +31,6 @@ func main() {
 		logger.Logger.Println("Starting server in debug mode")
 		gin.SetMode(gin.DebugMode)
 	}
-
-	// Initialize database and auto-migrate models
-	stores.GetDb().AutoMigrate(&models.User{})
 
 	// Set up the Gin router with default settings
 	router := gin.Default()

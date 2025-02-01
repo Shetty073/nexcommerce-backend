@@ -9,7 +9,7 @@ import (
 )
 
 type Brand struct {
-	ID          uuid.UUID  `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	ID          uuid.UUID  `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	Name        string     `gorm:"type:varchar(150);not null;unique;index"`
 	LogoImg     string     `gorm:"type:varchar(1024)"`
 	BannerImg   string     `gorm:"type:varchar(1024)"`

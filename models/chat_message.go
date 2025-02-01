@@ -9,7 +9,7 @@ import (
 )
 
 type ChatMessage struct {
-	ID          uuid.UUID  `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	ID          uuid.UUID  `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	Message     string     `gorm:"type:varchar(1000);not null"`
 	ChatID      uuid.UUID  `gorm:"type:uuid;not null;index"`
 	CreatedByID uuid.UUID  `gorm:"type:uuid;not null;index"`

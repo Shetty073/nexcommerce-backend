@@ -10,7 +10,7 @@ import (
 )
 
 type InventoryTransaction struct {
-	ID          uuid.UUID                        `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	ID          uuid.UUID                        `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	Status      enums.InventoryTransactionStatus `gorm:"type:varchar(15);index"`
 	Quantity    int                              `gorm:"type:int;not null"`
 	ProductID   uuid.UUID                        `gorm:"type:uuid;not null;index"`

@@ -9,7 +9,7 @@ import (
 )
 
 type Role struct {
-	ID         uuid.UUID  `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	ID         uuid.UUID  `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	Name       string     `gorm:"type:varchar(50);not null;unique;index"`
 	IsElevated bool       `gorm:"default:false;index"`
 	CreatedBy  uuid.UUID  `gorm:"type:uuid;not null;index"`
