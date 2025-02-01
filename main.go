@@ -1,9 +1,9 @@
 package main
 
 import (
-	responses "nexcommerce/common"
 	"nexcommerce/middlewares"
 	"nexcommerce/models"
+	"nexcommerce/responses"
 	"nexcommerce/routes/auth"
 	v1 "nexcommerce/routes/v1"
 	"nexcommerce/stores"
@@ -37,7 +37,6 @@ func main() {
 	// health endpoint
 	router.GET("/health", func(c *gin.Context) {
 		responses.Ok(c, nil)
-		return
 	})
 
 	router.ForwardedByClientIP = true

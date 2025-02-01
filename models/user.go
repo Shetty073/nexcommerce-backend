@@ -61,22 +61,25 @@ func GetAllUsers() ([]User, error) {
 	return users, nil
 }
 
-// GetUserByEmail retrieves a user by email
-func GetUserByEmail(email string) (*User, error) {
-	var user User
-	if err := stores.GetDb().Where("email = ?", email).First(&user).Error; err != nil {
-		return nil, err
-	}
-	return &user, nil
-}
+// GetUserByEmailOrUsername retrieves a user by email or username
+func GetUserByEmailOrUsername(email, username string, user *User) error {
+	db := stores.GetDb()
 
-// GetUserByUsername retrieves a user by username
-func GetUserByUsername(username string) (*User, error) {
-	var user User
-	if err := stores.GetDb().Where("username = ?", username).First(&user).Error; err != nil {
-		return nil, err
+	if email != "" {
+		err := db.Where("email = ?", email).First(user).Error
+		if err == nil {
+			return nil
+		}
 	}
-	return &user, nil
+
+	if username != "" {
+		err := db.Where("username = ?", username).First(user).Error
+		if err == nil {
+			return nil
+		}
+	}
+
+	return gorm.ErrRecordNotFound
 }
 
 // GetAllSupportTickets retrieves all support tickets for a user, regardless of role (customer, assigned, etc.)

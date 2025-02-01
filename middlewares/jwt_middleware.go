@@ -1,11 +1,11 @@
 package middlewares
 
 import (
-	responses "nexcommerce/common"
+	"nexcommerce/responses"
 	"nexcommerce/utils/config"
 
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func JWTMiddleware() gin.HandlerFunc {
