@@ -3,6 +3,7 @@ package middlewares
 import (
 	"nexcommerce/responses"
 	"nexcommerce/utils/config"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -17,19 +18,18 @@ func JWTMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// authParts := strings.Split(authHeader, " ")
-		// if len(authParts) != 2 || authParts[0] != "Bearer" {
-		// 	c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid authorization format"})
-		// 	c.Abort()
-		// 	return
-		// }
+		// Ensure the token is prefixed with 'Bearer '
+		authParts := strings.Split(authHeader, " ")
+		if len(authParts) != 2 || authParts[0] != "Bearer" {
+			responses.Unauthorized(c, "Invalid auth header format", "Authorization header must be in 'Bearer <token>' format")
+			c.Abort()
+			return
+		}
 
-		// tokenString := authParts[1]
-
-		tokenString := authHeader
+		tokenString := authParts[1]
 
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			// Check the signing method
+			// Ensure the token uses the expected signing method (HMAC in this case)
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, jwt.ErrSignatureInvalid
 			}
@@ -37,30 +37,30 @@ func JWTMiddleware() gin.HandlerFunc {
 		})
 
 		if err != nil || !token.Valid {
-			responses.Unauthorized(c, "Invalid token", "Authorization token is invalid")
+			responses.Unauthorized(c, "Invalid token", err.Error())
 			c.Abort()
 			return
 		}
 
 		claims, ok := token.Claims.(jwt.MapClaims)
 		if !ok {
-			responses.Unauthorized(c, "Invalid token claims", "Authorization token claims are invalid")
+			responses.Unauthorized(c, "Invalid token claims", "Unable to parse token claims")
 			c.Abort()
 			return
 		}
 
-		// You can access the claims here if needed
-		username, ok := claims["username"].(string)
+		// Extract user information or other claims from the token
+		userID, ok := claims["user_id"].(string) // Use user_id instead of username for generalization
 		if !ok {
-			responses.Unauthorized(c, "Invalid username claim", "Username claim in token is invalid")
+			responses.Unauthorized(c, "Invalid user claim", "User ID claim in token is invalid")
 			c.Abort()
 			return
 		}
 
-		// Optionally, set the claims or user information in the context for downstream handlers
-		c.Set("username", username)
+		// Set user info in context
+		c.Set("user_id", userID)
 
-		// Continue processing the request
+		// Continue with the request processing
 		c.Next()
 	}
 }

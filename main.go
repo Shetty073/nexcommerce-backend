@@ -8,10 +8,8 @@ import (
 	"nexcommerce/utils/config"
 	"nexcommerce/utils/logger"
 	"nexcommerce/utils/migrations"
-	"nexcommerce/utils/validators"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 )
 
 func init() {
@@ -21,6 +19,9 @@ func init() {
 	migrations.RegisterAllModels()
 }
 
+// @securityDefinitions.apikey AuthorizationToken
+// @in header
+// @name Authorization
 func main() {
 	// Setup gin server mode based on YAML config
 	switch config.Configs.Server.Mode {
@@ -51,10 +52,6 @@ func main() {
 	auth.Routes(router.Group(auth.RouteGroupName))
 	v1.UserRoutes(router.Group(v1.RouteGroupName))
 	v1.ApiDocRoutes(router.Group(v1.RouteGroupName))
-
-	// Register custom validator
-	validate := validator.New()
-	validators.RegisterValidators(validate)
 
 	// Run the Gin server
 	router.Run(config.Configs.Server.Port)

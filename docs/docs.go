@@ -115,6 +115,63 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/placeholder": {
+            "post": {
+                "security": [
+                    {
+                        "AuthorizationToken": []
+                    }
+                ],
+                "description": "This is a dummp placeholder",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Placeholder"
+                ],
+                "summary": "Placeholder dummy",
+                "parameters": [
+                    {
+                        "description": "Placeholder sample",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.LoginSchema"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.SuccessBody"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/responses.FailureBody"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/responses.FailureBody"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/responses.FailureBody"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -151,7 +208,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 32,
+                    "minLength": 8
                 },
                 "username": {
                     "type": "string"
@@ -161,7 +220,12 @@ const docTemplate = `{
         "schemas.RegisterSchema": {
             "type": "object",
             "required": [
+                "date_of_birth",
                 "email",
+                "first_name",
+                "gender",
+                "last_name",
+                "mobile_number",
                 "password",
                 "username"
             ],
@@ -173,25 +237,42 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "first_name": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 2
                 },
                 "gender": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "male",
+                        "female",
+                        "other"
+                    ]
                 },
                 "last_name": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 2
                 },
                 "mobile_number": {
                     "type": "string"
                 },
                 "password": {
                     "type": "string",
+                    "maxLength": 32,
                     "minLength": 8
                 },
                 "username": {
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "AuthorizationToken": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

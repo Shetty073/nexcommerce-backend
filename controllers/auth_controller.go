@@ -8,7 +8,6 @@ import (
 	"nexcommerce/utils/jwt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -30,16 +29,7 @@ func RegisterController(c *gin.Context) {
 	// Bind JSON request body to input struct
 	if err := c.ShouldBindJSON(&input); err != nil {
 		// Improved error handling to show validation failures
-		if ve, ok := err.(validator.ValidationErrors); ok {
-			var errors []string
-			for _, e := range ve {
-				errors = append(errors, e.Error()) // Collect all validation errors
-			}
-			responses.BadRequest(c, "Validation Error", errors, "")
-		} else {
-			// In case it's not a validation error, return the error message
-			responses.BadRequest(c, "Invalid Input", []string{""}, err.Error())
-		}
+		responses.BadRequest(c, "Invalid Input", err.Error())
 		return
 	}
 
@@ -92,16 +82,12 @@ func LoginController(c *gin.Context) {
 	// Bind JSON request body to input struct
 	if err := c.ShouldBindJSON(&input); err != nil {
 		// Improved error handling to show validation failures
-		if ve, ok := err.(validator.ValidationErrors); ok {
-			var errors []string
-			for _, e := range ve {
-				errors = append(errors, e.Error()) // Collect all validation errors
-			}
-			responses.BadRequest(c, "Validation Error", errors, "")
-		} else {
-			// In case it's not a validation error, return the error message
-			responses.BadRequest(c, "Invalid Input", []string{""}, err.Error())
-		}
+		responses.BadRequest(c, "Invalid Input", err.Error())
+		return
+	}
+
+	if input.Email == "" && input.Username == "" {
+		responses.BadRequest(c, "Invalid Input", "Please provide username or email")
 		return
 	}
 
@@ -109,13 +95,13 @@ func LoginController(c *gin.Context) {
 	var user models.User
 	err := models.GetUserByEmailOrUsername(input.Email, input.Username, &user)
 	if err != nil {
-		responses.Unauthorized(c, "Authentication Error", "Invalid credentials")
+		responses.Unauthorized(c, "Authentication Error", err.Error())
 		return
 	}
 
 	// Compare provided password with stored hash
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password)); err != nil {
-		responses.Unauthorized(c, "Authentication Error", "Invalid credentials")
+		responses.Unauthorized(c, "Authentication Error", err.Error())
 		return
 	}
 

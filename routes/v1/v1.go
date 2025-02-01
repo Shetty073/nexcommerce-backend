@@ -3,6 +3,7 @@ package v1
 import (
 	"net/http"
 	"nexcommerce/middlewares"
+	"nexcommerce/responses"
 
 	_ "nexcommerce/docs"
 
@@ -13,7 +14,22 @@ import (
 
 var RouteGroupName = "/v1"
 
-func PlaceHolder(c *gin.Context) {}
+// Placeholder is a test controller
+// @Summary Placeholder dummy
+// @Description This is a dummp placeholder
+// @Tags Placeholder
+// @Accept json
+// @Produce json
+// @Param request body schemas.LoginSchema true "Placeholder sample"
+// @Success 200 {object} responses.SuccessBody
+// @Failure 400 {object} responses.FailureBody
+// @Failure 401 {object} responses.FailureBody
+// @Failure 500 {object} responses.FailureBody
+// @Router /placeholder [post]
+// @Security AuthorizationToken
+func PlaceHolder(c *gin.Context) {
+	responses.Ok(c, gin.H{"message": "Hello, world!"})
+}
 
 func UserRoutes(router *gin.RouterGroup) {
 	router.Use(middlewares.JWTMiddleware())

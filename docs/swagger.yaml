@@ -19,6 +19,8 @@ definitions:
       email:
         type: string
       password:
+        maxLength: 32
+        minLength: 8
         type: string
       username:
         type: string
@@ -32,20 +34,34 @@ definitions:
       email:
         type: string
       first_name:
+        maxLength: 50
+        minLength: 2
         type: string
       gender:
+        enum:
+        - male
+        - female
+        - other
         type: string
       last_name:
+        maxLength: 50
+        minLength: 2
         type: string
       mobile_number:
         type: string
       password:
+        maxLength: 32
         minLength: 8
         type: string
       username:
         type: string
     required:
+    - date_of_birth
     - email
+    - first_name
+    - gender
+    - last_name
+    - mobile_number
     - password
     - username
     type: object
@@ -120,4 +136,45 @@ paths:
       summary: Register a new customer
       tags:
       - Auth
+  /placeholder:
+    post:
+      consumes:
+      - application/json
+      description: This is a dummp placeholder
+      parameters:
+      - description: Placeholder sample
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.LoginSchema'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.SuccessBody'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.FailureBody'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.FailureBody'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.FailureBody'
+      security:
+      - AuthorizationToken: []
+      summary: Placeholder dummy
+      tags:
+      - Placeholder
+securityDefinitions:
+  AuthorizationToken:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

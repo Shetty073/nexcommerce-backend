@@ -11,25 +11,10 @@ type SuccessBody struct {
 	Data    interface{} `json:"data,omitempty"`
 }
 
-type BadRequestBody struct {
-	Success  bool     `json:"success"`
-	Error    string   `json:"error"`
-	Messages []string `json:"messages"`
-}
-
 type FailureBody struct {
 	Success bool   `json:"success"`
 	Error   string `json:"error"`
 	Message string `json:"message"`
-}
-
-// helper functions to get the basic success and failure responses skeleton
-func getBadRequestResponse(c *gin.Context, status int, error string, messages []string) {
-	c.JSON(status, BadRequestBody{
-		Success:  false,
-		Error:    error,
-		Messages: messages,
-	})
 }
 
 // helper functions to get the basic success and failure responses skeleton
@@ -76,12 +61,8 @@ func Found(c *gin.Context, data gin.H) {
 }
 
 // client errors
-func BadRequest(c *gin.Context, error string, messages []string, message string) {
-	if message != "" {
-		getFailureResponse(c, http.StatusNotFound, error, message)
-	} else {
-		getBadRequestResponse(c, http.StatusBadRequest, error, messages)
-	}
+func BadRequest(c *gin.Context, error string, message string) {
+	getFailureResponse(c, http.StatusBadRequest, error, message)
 }
 
 func NotFound(c *gin.Context, error string, message string) {
