@@ -1,4 +1,19 @@
 definitions:
+  responses.FailureBody:
+    properties:
+      error:
+        type: string
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  responses.SuccessBody:
+    properties:
+      data: {}
+      success:
+        type: boolean
+    type: object
   schemas.LoginSchema:
     properties:
       email:
@@ -56,23 +71,19 @@ paths:
         "200":
           description: OK
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/responses.SuccessBody'
         "400":
           description: Bad Request
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/responses.FailureBody'
         "401":
           description: Unauthorized
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/responses.FailureBody'
         "500":
           description: Internal Server Error
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/responses.FailureBody'
       summary: User login
       tags:
       - Auth

@@ -28,7 +28,7 @@ func UserRoutes(router *gin.RouterGroup) {
 }
 
 func ApiDocRoutes(router *gin.RouterGroup) {
-	router.Use(middlewares.JWTMiddleware())
+	router.Use()
 	{
 		// API documentation
 		router.Handle(http.MethodGet, "/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

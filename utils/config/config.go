@@ -20,6 +20,9 @@ type Config struct {
 			ConnectionString string `yaml:"connection_string"`
 		}
 	}
+	Auth struct {
+		TokenValidityInHrs int `yaml:"token_validity_in_hrs"`
+	}
 }
 
 var Configs Config

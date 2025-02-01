@@ -42,10 +42,12 @@ func main() {
 	router.ForwardedByClientIP = true
 	router.SetTrustedProxies([]string{"127.0.0.1"})
 
-	// add all of the routes
-	v1.UserRoutes(router.Group(v1.RouteGroupName))
-	v1.ApiDocRoutes(router.Group(v1.RouteGroupName))
+	// register all of the routes
 	auth.Routes(router.Group(auth.RouteGroupName))
+
+	v1.UserRoutes(router.Group(v1.RouteGroupName))
+
+	v1.ApiDocRoutes(router.Group(v1.RouteGroupName))
 
 	router.Run(config.Configs.Server.Port)
 }

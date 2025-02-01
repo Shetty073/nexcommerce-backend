@@ -4,6 +4,7 @@ import (
 	"nexcommerce/models"
 	"nexcommerce/responses"
 	"nexcommerce/schemas"
+	"nexcommerce/utils/config"
 	"nexcommerce/utils/jwt"
 
 	"github.com/gin-gonic/gin"
@@ -11,8 +12,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// RegisterController handles user registration
-// @Summary Register a new user
+// RegisterController handles customer registration
+// @Summary Register a new customer
 // @Description Creates a new user with the provided details
 // @Tags Auth
 // @Accept json
@@ -68,10 +69,10 @@ func RegisterController(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param request body schemas.LoginSchema true "User login data"
-// @Success 200 {object} map[string]interface{}
-// @Failure 400 {object} map[string]interface{}
-// @Failure 401 {object} map[string]interface{}
-// @Failure 500 {object} map[string]interface{}
+// @Success 200 {object} responses.SuccessBody
+// @Failure 400 {object} responses.FailureBody
+// @Failure 401 {object} responses.FailureBody
+// @Failure 500 {object} responses.FailureBody
 // @Router /login [post]
 func LoginController(c *gin.Context) {
 	var input schemas.LoginSchema
@@ -97,7 +98,7 @@ func LoginController(c *gin.Context) {
 	}
 
 	// Generate JWT token using your existing function
-	tokenString, err := jwt.GenerateToken(user.Username, 24) // Token valid for 24 hours
+	tokenString, err := jwt.GenerateToken(user.ID.String(), config.Configs.Auth.TokenValidityInHrs)
 	if err != nil {
 		responses.InternalServerError(c, "Token Generation Error", "Failed to generate token")
 		return
