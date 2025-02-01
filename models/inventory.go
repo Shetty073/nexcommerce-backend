@@ -14,32 +14,39 @@ type Inventory struct {
 	Description       string     `gorm:"type:varchar(250)"`
 	StockLevel        int        `gorm:"type:int;not null;index"`
 	MinimumStockLevel int        `gorm:"type:int;not null;index"`
-	Product           Product    `gorm:"foreignKey:ProductID;index"`
-	Warehouse         Warehouse  `gorm:"foreignKey:WarehouseID;index"`
-	CreatedBy         User       `gorm:"foreignKey:CreatedBy;index"`
-	UpdatedBy         User       `gorm:"foreignKey:UpdatedBy;index"`
+	ProductID         uuid.UUID  `gorm:"type:uuid;not null;index"`
+	WarehouseID       uuid.UUID  `gorm:"type:uuid;not null;index"`
+	CreatedByID       uuid.UUID  `gorm:"type:uuid;not null;index"`
+	UpdatedByID       uuid.UUID  `gorm:"type:uuid;not null;index"`
 	CreatedAt         *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
-	UpdatedAt         *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;index"`
+	UpdatedAt         *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
 	DeletedAt         gorm.DeletedAt
+
+	Product   Product   `gorm:"foreignKey:ProductID"`
+	Warehouse Warehouse `gorm:"foreignKey:WarehouseID"`
+	CreatedBy User      `gorm:"foreignKey:CreatedByID"`
+	UpdatedBy User      `gorm:"foreignKey:UpdatedByID"`
 }
 
-// Receiver Methods
+// Create creates a new inventory record
 func (i *Inventory) Create() error {
 	return stores.GetDb().Create(i).Error
 }
 
+// Update updates an existing inventory record
 func (i *Inventory) Update() error {
 	return stores.GetDb().Save(i).Error
 }
 
+// Delete soft deletes an inventory record
 func (i *Inventory) Delete() error {
 	return stores.GetDb().Delete(i).Error
 }
 
-// GetInventoryByID retrieves an inventory by ID
+// GetInventoryByID retrieves an inventory record by ID
 func GetInventoryByID(id uuid.UUID) (*Inventory, error) {
 	var inventory Inventory
-	if err := stores.GetDb().First(&inventory, "id = ?", id).Error; err != nil {
+	if err := stores.GetDb().Preload("Product").Preload("Warehouse").Preload("CreatedBy").Preload("UpdatedBy").First(&inventory, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
 	return &inventory, nil

@@ -9,13 +9,17 @@ import (
 )
 
 type RoleModulePermission struct {
-	ID         uuid.UUID  `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
-	Role       Role       `gorm:"foreignKey:RoleID;index"`
-	Module     Module     `gorm:"foreignKey:ModuleID;index"`
-	Permission Permission `gorm:"foreignKey:PermissionID;index"`
-	CreatedAt  *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
-	UpdatedAt  *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;index"`
-	DeletedAt  gorm.DeletedAt
+	ID           uuid.UUID  `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	RoleID       uuid.UUID  `gorm:"type:uuid;not null;index"` // Foreign key for RoleID
+	ModuleID     uuid.UUID  `gorm:"type:uuid;not null;index"` // Foreign key for ModuleID
+	PermissionID uuid.UUID  `gorm:"type:uuid;not null;index"` // Foreign key for PermissionID
+	CreatedAt    *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
+	UpdatedAt    *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
+	DeletedAt    gorm.DeletedAt
+
+	Role       Role       `gorm:"foreignKey:RoleID"`
+	Module     Module     `gorm:"foreignKey:ModuleID"`
+	Permission Permission `gorm:"foreignKey:PermissionID"`
 }
 
 // CreateRoleModulePermission creates a new RoleModulePermission
@@ -36,7 +40,8 @@ func (rmp *RoleModulePermission) DeleteRoleModulePermission() error {
 // GetRoleModulePermission retrieves a RoleModulePermission by ID
 func GetRoleModulePermission(id uuid.UUID) (*RoleModulePermission, error) {
 	var rmp RoleModulePermission
-	if err := stores.GetDb().First(&rmp, "id = ?", id).Error; err != nil {
+	// Preload the associated Role, Module, and Permission
+	if err := stores.GetDb().Preload("Role").Preload("Module").Preload("Permission").First(&rmp, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
 	return &rmp, nil

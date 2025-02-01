@@ -22,10 +22,12 @@ type Address struct {
 	Country   string     `gorm:"type:varchar(100);index"`
 	Alias     string     `gorm:"type:varchar(20);index"`
 	IsDefault bool       `gorm:"default:false;index"`
-	User      User       `gorm:"foreignKey:UserID;index"`
+	UserID    uuid.UUID  `gorm:"type:uuid;not null;index"`
 	CreatedAt *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
-	UpdatedAt *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;index"`
+	UpdatedAt *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
 	DeletedAt gorm.DeletedAt
+
+	User User `gorm:"foreignKey:UserID"`
 }
 
 // CreateAddress creates a new address
@@ -46,7 +48,7 @@ func (a *Address) DeleteAddress() error {
 // GetAddressByID retrieves an address by ID
 func GetAddressByID(id uuid.UUID) (*Address, error) {
 	var address Address
-	if err := stores.GetDb().First(&address, "id = ?", id).Error; err != nil {
+	if err := stores.GetDb().Preload("User").First(&address, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
 	return &address, nil

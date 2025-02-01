@@ -4,7 +4,7 @@
         "contact": {}
     },
     "paths": {
-        "/login": {
+        "/auth/login": {
             "post": {
                 "description": "Authenticates a user with email/username and password, and returns a JWT token",
                 "consumes": [
@@ -56,7 +56,7 @@
                 }
             }
         },
-        "/register": {
+        "/auth/register": {
             "post": {
                 "description": "Creates a new user with the provided details",
                 "consumes": [
@@ -68,7 +68,7 @@
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Register a new user",
+                "summary": "Register a new customer",
                 "parameters": [
                     {
                         "description": "User registration data",

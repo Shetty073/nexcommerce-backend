@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/login": {
+        "/auth/login": {
             "post": {
                 "description": "Authenticates a user with email/username and password, and returns a JWT token",
                 "consumes": [
@@ -67,7 +67,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/register": {
+        "/auth/register": {
             "post": {
                 "description": "Creates a new user with the provided details",
                 "consumes": [
@@ -79,7 +79,7 @@ const docTemplate = `{
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Register a new user",
+                "summary": "Register a new customer",
                 "parameters": [
                     {
                         "description": "User registration data",

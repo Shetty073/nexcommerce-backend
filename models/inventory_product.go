@@ -1,6 +1,7 @@
 package models
 
 import (
+	"nexcommerce/constants/enums"
 	"nexcommerce/stores"
 	"time"
 
@@ -9,15 +10,19 @@ import (
 )
 
 type InventoryProduct struct {
-	ID        uuid.UUID  `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
-	SKU       string     `gorm:"type:varchar(50);not null;index"`
-	Status    string     `gorm:"type:enum('active', 'inactive');not null;index"`
-	Inventory Inventory  `gorm:"foreignKey:InventoryID;index"`
-	CreatedBy User       `gorm:"foreignKey:CreatedBy;index"`
-	UpdatedBy User       `gorm:"foreignKey:UpdatedBy;index"`
-	CreatedAt *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
-	UpdatedAt *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;index"`
-	DeletedAt gorm.DeletedAt
+	ID          uuid.UUID                    `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	SKU         string                       `gorm:"type:varchar(50);not null;index"`
+	Status      enums.InventoryProductStatus `gorm:"type:varchar(15);index"`
+	InventoryID uuid.UUID                    `gorm:"type:uuid;not null;index"`
+	CreatedByID uuid.UUID                    `gorm:"type:uuid;not null;index"`
+	UpdatedByID uuid.UUID                    `gorm:"type:uuid;index"`
+	CreatedAt   *time.Time                   `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
+	UpdatedAt   *time.Time                   `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
+	DeletedAt   gorm.DeletedAt
+
+	Inventory Inventory `gorm:"foreignKey:InventoryID"`
+	CreatedBy User      `gorm:"foreignKey:CreatedByID"`
+	UpdatedBy User      `gorm:"foreignKey:UpdatedByID"`
 }
 
 // Receiver Methods
@@ -36,7 +41,7 @@ func (ip *InventoryProduct) Delete() error {
 // GetInventoryProductByID retrieves an inventory product by ID
 func GetInventoryProductByID(id uuid.UUID) (*InventoryProduct, error) {
 	var ip InventoryProduct
-	if err := stores.GetDb().First(&ip, "id = ?", id).Error; err != nil {
+	if err := stores.GetDb().Preload("Inventory").Preload("CreatedBy").Preload("UpdatedBy").First(&ip, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
 	return &ip, nil

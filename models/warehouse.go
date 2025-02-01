@@ -18,11 +18,14 @@ type Warehouse struct {
 	District  string     `gorm:"type:varchar(100)"`
 	State     string     `gorm:"type:varchar(100)"`
 	Country   string     `gorm:"type:varchar(100);index"`
-	CreatedBy User       `gorm:"foreignKey:CreatedBy;index"`
-	UpdatedBy User       `gorm:"foreignKey:UpdatedBy;index"`
+	CreatedBy uuid.UUID  `gorm:"type:uuid;not null;index"`
+	UpdatedBy uuid.UUID  `gorm:"type:uuid;index"`
 	CreatedAt *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
-	UpdatedAt *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;index"`
+	UpdatedAt *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
 	DeletedAt gorm.DeletedAt
+
+	CreatedByUser User `gorm:"foreignKey:CreatedBy"`
+	UpdatedByUser User `gorm:"foreignKey:UpdatedBy"`
 }
 
 // CreateWarehouse creates a new warehouse
@@ -43,7 +46,7 @@ func (w *Warehouse) DeleteWarehouse() error {
 // GetWarehouseByID retrieves a warehouse by ID
 func GetWarehouseByID(id uuid.UUID) (*Warehouse, error) {
 	var warehouse Warehouse
-	if err := stores.GetDb().First(&warehouse, "id = ?", id).Error; err != nil {
+	if err := stores.GetDb().Preload("CreatedByUser").Preload("UpdatedByUser").First(&warehouse, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
 	return &warehouse, nil

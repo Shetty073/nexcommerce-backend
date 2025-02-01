@@ -11,11 +11,14 @@ import (
 type Module struct {
 	ID        uuid.UUID  `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
 	Name      string     `gorm:"type:varchar(50);not null;unique"`
-	CreatedBy User       `gorm:"foreignKey:CreatedBy;index"`
-	UpdatedBy User       `gorm:"foreignKey:UpdatedBy;index"`
+	CreatedBy uuid.UUID  `gorm:"type:uuid;not null;index"`
+	UpdatedBy uuid.UUID  `gorm:"type:uuid;not null;index"`
 	CreatedAt *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
-	UpdatedAt *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;index"`
+	UpdatedAt *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
 	DeletedAt gorm.DeletedAt
+
+	UserCreatedBy User `gorm:"foreignKey:CreatedBy"`
+	UserUpdatedBy User `gorm:"foreignKey:UpdatedBy"`
 }
 
 // CreateModule creates a new module
@@ -37,7 +40,8 @@ func (m *Module) DeleteModule() error {
 // GetModuleByID retrieves a module by ID
 func GetModuleByID(id uuid.UUID) (*Module, error) {
 	var module Module
-	if err := stores.GetDb().First(&module, "id = ?", id).Error; err != nil {
+	// Preload the associated UserCreatedBy and UserUpdatedBy relationships
+	if err := stores.GetDb().Preload("UserCreatedBy").Preload("UserUpdatedBy").First(&module, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
 	return &module, nil

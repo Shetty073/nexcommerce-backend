@@ -16,12 +16,16 @@ type MarketingCampaign struct {
 	StoreBannerImg string     `gorm:"type:varchar(1024)"`
 	StartDate      string     `gorm:"type:datetime;not null;index"`
 	EndDate        string     `gorm:"type:datetime;not null;index"`
-	Product        Product    `gorm:"foreignKey:ProductID;index"`
-	CreatedBy      User       `gorm:"foreignKey:CreatedBy;index"`
-	UpdatedBy      User       `gorm:"foreignKey:UpdatedBy;index"`
+	ProductID      uuid.UUID  `gorm:"type:uuid;not null;index"`
+	CreatedByID    uuid.UUID  `gorm:"type:uuid;not null;index"`
+	UpdatedByID    uuid.UUID  `gorm:"type:uuid;index"`
 	CreatedAt      *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
-	UpdatedAt      *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;index"`
+	UpdatedAt      *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
 	DeletedAt      gorm.DeletedAt
+
+	Product   Product `gorm:"foreignKey:ProductID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	CreatedBy User    `gorm:"foreignKey:CreatedByID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	UpdatedBy User    `gorm:"foreignKey:UpdatedByID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 // Receiver Methods

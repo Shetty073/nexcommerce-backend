@@ -1,6 +1,7 @@
 package models
 
 import (
+	"nexcommerce/constants/enums"
 	"nexcommerce/stores"
 	"time"
 
@@ -9,17 +10,22 @@ import (
 )
 
 type SupportTicket struct {
-	ID               uuid.UUID  `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
-	IssueType        string     `gorm:"type:enum('technical', 'billing', 'other');not null;index"`
-	IssueDescription string     `gorm:"type:varchar(500);not null"`
-	Status           string     `gorm:"type:enum('open', 'closed', 'in-progress');not null;index"`
-	Customer         User       `gorm:"foreignKey:CustomerID;index"`
-	AssignedTo       User       `gorm:"foreignKey:AssignedTo;index"`
-	CreatedBy        User       `gorm:"foreignKey:CreatedBy;index"`
-	UpdatedBy        User       `gorm:"foreignKey:UpdatedBy;index"`
-	CreatedAt        *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
-	UpdatedAt        *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;index"`
+	ID               uuid.UUID                    `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	IssueType        enums.SupportTicketIssueType `gorm:"type:varchar(15);index"`
+	IssueDescription string                       `gorm:"type:varchar(500);not null"`
+	Status           enums.SupportTicketStatus    `gorm:"type:varchar(15);index"`
+	CustomerID       uuid.UUID                    `gorm:"type:uuid;not null;index"`
+	AssignedToID     uuid.UUID                    `gorm:"type:uuid;index"`
+	CreatedByID      uuid.UUID                    `gorm:"type:uuid;not null;index"`
+	UpdatedByID      uuid.UUID                    `gorm:"type:uuid;index"`
+	CreatedAt        *time.Time                   `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
+	UpdatedAt        *time.Time                   `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
 	DeletedAt        gorm.DeletedAt
+
+	Customer   User `gorm:"foreignKey:CustomerID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	AssignedTo User `gorm:"foreignKey:AssignedToID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	CreatedBy  User `gorm:"foreignKey:CreatedByID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	UpdatedBy  User `gorm:"foreignKey:UpdatedByID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 // Receiver Methods

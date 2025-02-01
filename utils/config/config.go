@@ -16,7 +16,7 @@ type Config struct {
 		Secret string `yaml:"secret"`
 	}
 	Stores struct {
-		MySql struct {
+		Postgres struct {
 			ConnectionString string `yaml:"connection_string"`
 		}
 	}

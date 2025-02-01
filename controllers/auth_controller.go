@@ -8,6 +8,7 @@ import (
 	"nexcommerce/utils/jwt"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -22,16 +23,27 @@ import (
 // @Success 201 {object} map[string]interface{}
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
-// @Router /register [post]
+// @Router /auth/register [post]
 func RegisterController(c *gin.Context) {
 	var input schemas.RegisterSchema
 
 	// Bind JSON request body to input struct
 	if err := c.ShouldBindJSON(&input); err != nil {
-		responses.BadRequest(c, "Validation Error", err.Error())
+		// Improved error handling to show validation failures
+		if ve, ok := err.(validator.ValidationErrors); ok {
+			var errors []string
+			for _, e := range ve {
+				errors = append(errors, e.Error()) // Collect all validation errors
+			}
+			responses.BadRequest(c, "Validation Error", errors, "")
+		} else {
+			// In case it's not a validation error, return the error message
+			responses.BadRequest(c, "Invalid Input", []string{""}, err.Error())
+		}
 		return
 	}
 
+	// Proceed with password hashing
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	if err != nil {
 		responses.InternalServerError(c, "Hashing Error", "Failed to hash password")
@@ -52,13 +64,13 @@ func RegisterController(c *gin.Context) {
 		IsCustomer:   true,
 	}
 
-	// Save to database
+	// Save user to the database
 	if err := user.CreateUser(); err != nil {
 		responses.InternalServerError(c, err.Error(), "Failed to create user")
 		return
 	}
 
-	// Respond with success
+	// Success response
 	responses.Created(c, gin.H{"message": "User registered successfully"})
 }
 
@@ -73,13 +85,23 @@ func RegisterController(c *gin.Context) {
 // @Failure 400 {object} responses.FailureBody
 // @Failure 401 {object} responses.FailureBody
 // @Failure 500 {object} responses.FailureBody
-// @Router /login [post]
+// @Router /auth/login [post]
 func LoginController(c *gin.Context) {
 	var input schemas.LoginSchema
 
 	// Bind JSON request body to input struct
 	if err := c.ShouldBindJSON(&input); err != nil {
-		responses.BadRequest(c, "Validation Error", err.Error())
+		// Improved error handling to show validation failures
+		if ve, ok := err.(validator.ValidationErrors); ok {
+			var errors []string
+			for _, e := range ve {
+				errors = append(errors, e.Error()) // Collect all validation errors
+			}
+			responses.BadRequest(c, "Validation Error", errors, "")
+		} else {
+			// In case it's not a validation error, return the error message
+			responses.BadRequest(c, "Invalid Input", []string{""}, err.Error())
+		}
 		return
 	}
 

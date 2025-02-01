@@ -9,13 +9,18 @@ import (
 )
 
 type ChatMessage struct {
-	ID        uuid.UUID  `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
-	Message   string     `gorm:"type:varchar(1000);not null"`
-	CreatedBy User       `gorm:"foreignKey:CreatedBy;index"`
-	UpdatedBy User       `gorm:"foreignKey:UpdatedBy;index"`
-	CreatedAt *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
-	UpdatedAt *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;index"`
-	DeletedAt gorm.DeletedAt
+	ID          uuid.UUID  `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	Message     string     `gorm:"type:varchar(1000);not null"`
+	ChatID      uuid.UUID  `gorm:"type:uuid;not null;index"`
+	CreatedByID uuid.UUID  `gorm:"type:uuid;not null;index"`
+	UpdatedByID uuid.UUID  `gorm:"type:uuid;index"`
+	CreatedAt   *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
+	UpdatedAt   *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
+	DeletedAt   gorm.DeletedAt
+
+	Chat      Chat `gorm:"foreignKey:ChatID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	CreatedBy User `gorm:"foreignKey:CreatedByID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	UpdatedBy User `gorm:"foreignKey:UpdatedByID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 // Receiver Methods

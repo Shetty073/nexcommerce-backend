@@ -1,6 +1,7 @@
 package models
 
 import (
+	"nexcommerce/constants/enums"
 	"nexcommerce/stores"
 	"time"
 
@@ -9,21 +10,21 @@ import (
 )
 
 type User struct {
-	ID           uuid.UUID  `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
-	Username     string     `gorm:"unique;not null;index"`
-	Email        string     `gorm:"unique;not null;index"`
-	Password     string     `gorm:"not null"`
-	FirstName    string     `gorm:"type:varchar(50)"`
-	LastName     string     `gorm:"type:varchar(50)"`
-	DateOfBirth  string     `gorm:"type:date"`
-	Gender       string     `gorm:"type:varchar(12)"`
-	MobileNumber string     `gorm:"type:varchar(15);index"`
-	IsStaff      bool       `gorm:"default:false;index"`
-	IsCustomer   bool       `gorm:"default:false;index"`
-	LastLoginAt  *time.Time `gorm:"type:timestamp;index"`
-	Status       string     `gorm:"type:enum('active','inactive','banned');default:'active';index"`
-	CreatedAt    *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
-	UpdatedAt    *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;index"`
+	ID           uuid.UUID        `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	Username     string           `gorm:"unique;not null;index"`
+	Email        string           `gorm:"unique;not null;index"`
+	Password     string           `gorm:"not null"`
+	FirstName    string           `gorm:"type:varchar(50)"`
+	LastName     string           `gorm:"type:varchar(50)"`
+	DateOfBirth  string           `gorm:"type:date"`
+	Gender       string           `gorm:"type:varchar(12)"`
+	MobileNumber string           `gorm:"type:varchar(15);index"`
+	IsStaff      bool             `gorm:"default:false;index"`
+	IsCustomer   bool             `gorm:"default:false;index"`
+	LastLoginAt  *time.Time       `gorm:"type:timestamp;index"`
+	Status       enums.UserStatus `gorm:"type:varchar(15);index"`
+	CreatedAt    *time.Time       `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
+	UpdatedAt    *time.Time       `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
 	DeletedAt    gorm.DeletedAt
 }
 
