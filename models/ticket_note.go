@@ -9,18 +9,22 @@ import (
 )
 
 type TicketNote struct {
-	ID         uuid.UUID     `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
-	UpdateNote string        `gorm:"type:varchar(1000)"`
-	Image1     string        `gorm:"type:varchar(1024)"`
-	Image2     string        `gorm:"type:varchar(1024)"`
-	Image3     string        `gorm:"type:varchar(1024)"`
-	Image4     string        `gorm:"type:varchar(1024)"`
-	Ticket     SupportTicket `gorm:"foreignKey:TicketID;index"`
-	CreatedBy  User          `gorm:"foreignKey:CreatedBy;index"`
-	UpdatedBy  User          `gorm:"foreignKey:UpdatedBy;index"`
-	CreatedAt  *time.Time    `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
-	UpdatedAt  *time.Time    `gorm:"type:timestamp;default:CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;index"`
-	DeletedAt  gorm.DeletedAt
+	ID          uuid.UUID  `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
+	UpdateNote  string     `gorm:"type:varchar(1000)"`
+	Image1      string     `gorm:"type:varchar(1024)"`
+	Image2      string     `gorm:"type:varchar(1024)"`
+	Image3      string     `gorm:"type:varchar(1024)"`
+	Image4      string     `gorm:"type:varchar(1024)"`
+	TicketID    uuid.UUID  `gorm:"type:uuid;not null;index"`
+	CreatedByID uuid.UUID  `gorm:"type:uuid;not null;index"`
+	UpdatedByID uuid.UUID  `gorm:"type:uuid;index"`
+	CreatedAt   *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
+	UpdatedAt   *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
+	DeletedAt   gorm.DeletedAt
+
+	Ticket    SupportTicket `gorm:"foreignKey:TicketID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	CreatedBy User          `gorm:"foreignKey:CreatedByID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	UpdatedBy User          `gorm:"foreignKey:UpdatedByID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 // Receiver Methods

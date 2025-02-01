@@ -9,12 +9,16 @@ import (
 )
 
 type UserRole struct {
-	ID        uuid.UUID  `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
-	User      User       `gorm:"foreignKey:UserID;index"`
-	Role      Role       `gorm:"foreignKey:RoleID;index"`
+	ID        uuid.UUID  `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
+	UserID    uuid.UUID  `gorm:"type:uuid;not null;index"` // Foreign key for UserID
+	RoleID    uuid.UUID  `gorm:"type:uuid;not null;index"` // Foreign key for RoleID
 	CreatedAt *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
-	UpdatedAt *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;index"`
+	UpdatedAt *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
 	DeletedAt gorm.DeletedAt
+
+	// Explicit relationships for GORM
+	User User `gorm:"foreignKey:UserID"`
+	Role Role `gorm:"foreignKey:RoleID"`
 }
 
 // CreateUserRole creates a new UserRole
@@ -35,7 +39,8 @@ func (ur *UserRole) DeleteUserRole() error {
 // GetUserRole retrieves a UserRole by ID
 func GetUserRole(id uuid.UUID) (*UserRole, error) {
 	var userRole UserRole
-	if err := stores.GetDb().First(&userRole, "id = ?", id).Error; err != nil {
+	// Preload the associated User and Role
+	if err := stores.GetDb().Preload("User").Preload("Role").First(&userRole, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
 	return &userRole, nil

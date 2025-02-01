@@ -6,5 +6,8 @@ jwt:
   secret: "fde923749e4fcf9e90222debf2612219610869b90f6988177f2ef23cf623c43d"
 
 stores:
-  mysql:
-    connection_string: "username:password@tcp(127.0.0.1:3306)/db_name?charset=utf8mb4&parseTime=True&loc=Local"
+  postgres:
+    connection_string: "postgres://username:password@127.0.0.1:5432/nexcommerce?sslmode=disable"
+
+auth:
+  token_validity_in_hrs: 1

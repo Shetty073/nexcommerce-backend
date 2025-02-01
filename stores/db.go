@@ -4,7 +4,7 @@ import (
 	"nexcommerce/utils/config"
 	"sync"
 
-	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -16,10 +16,10 @@ var (
 func GetDb() *gorm.DB {
 	once.Do(func() {
 		// Replace with your MySQL connection details
-		dsn := config.Configs.Stores.MySql.ConnectionString
+		dsn := config.Configs.Stores.Postgres.ConnectionString
 
 		// Open a connection to MySQL
-		newDB, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+		newDB, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 		if err != nil {
 			panic(err) // or handle the error accordingly
 		}

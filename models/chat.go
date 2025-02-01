@@ -1,6 +1,7 @@
 package models
 
 import (
+	"nexcommerce/constants/enums"
 	"nexcommerce/stores"
 	"time"
 
@@ -9,14 +10,18 @@ import (
 )
 
 type Chat struct {
-	ID        uuid.UUID     `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
-	Status    string        `gorm:"type:enum('active', 'closed');not null;index"`
-	Ticket    SupportTicket `gorm:"foreignKey:TicketID;index"`
-	CreatedBy User          `gorm:"foreignKey:CreatedBy;index"`
-	UpdatedBy User          `gorm:"foreignKey:UpdatedBy;index"`
-	CreatedAt *time.Time    `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
-	UpdatedAt *time.Time    `gorm:"type:timestamp;default:CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;index"`
-	DeletedAt gorm.DeletedAt
+	ID          uuid.UUID        `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
+	Status      enums.ChatStatus `gorm:"type:varchar(15);index"`
+	TicketID    uuid.UUID        `gorm:"type:uuid;not null;index"`
+	CreatedByID uuid.UUID        `gorm:"type:uuid;not null;index"`
+	UpdatedByID uuid.UUID        `gorm:"type:uuid;index"`
+	CreatedAt   *time.Time       `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
+	UpdatedAt   *time.Time       `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
+	DeletedAt   gorm.DeletedAt
+
+	Ticket    SupportTicket `gorm:"foreignKey:TicketID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	CreatedBy User          `gorm:"foreignKey:CreatedByID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	UpdatedBy User          `gorm:"foreignKey:UpdatedByID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 // Receiver Methods

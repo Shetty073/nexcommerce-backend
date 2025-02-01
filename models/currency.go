@@ -9,16 +9,19 @@ import (
 )
 
 type Currency struct {
-	ID                  uuid.UUID  `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	ID                  uuid.UUID  `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	Name                string     `gorm:"type:varchar(20);not null;index"`
 	Symbol              string     `gorm:"type:varchar(5);index"`
 	ShortCode           string     `gorm:"type:varchar(5);index"`
 	DollarExchangeValue float64    `gorm:"type:decimal"`
-	CreatedBy           User       `gorm:"foreignKey:CreatedBy;index"`
-	UpdatedBy           User       `gorm:"foreignKey:UpdatedBy;index"`
+	CreatedBy           uuid.UUID  `gorm:"type:uuid;not null;index"`
+	UpdatedBy           uuid.UUID  `gorm:"type:uuid;index"`
 	CreatedAt           *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
-	UpdatedAt           *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;index"`
+	UpdatedAt           *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
 	DeletedAt           gorm.DeletedAt
+
+	CreatedByUser User `gorm:"foreignKey:CreatedBy"`
+	UpdatedByUser User `gorm:"foreignKey:UpdatedBy"`
 }
 
 // CreateCurrency creates a new currency
@@ -39,7 +42,7 @@ func (c *Currency) DeleteCurrency() error {
 // GetCurrencyByID retrieves a currency by ID
 func GetCurrencyByID(id uuid.UUID) (*Currency, error) {
 	var currency Currency
-	if err := stores.GetDb().First(&currency, "id = ?", id).Error; err != nil {
+	if err := stores.GetDb().Preload("CreatedByUser").Preload("UpdatedByUser").First(&currency, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
 	return &currency, nil

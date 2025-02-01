@@ -9,13 +9,16 @@ import (
 )
 
 type Permission struct {
-	ID        uuid.UUID  `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	ID        uuid.UUID  `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	Name      string     `gorm:"type:varchar(50);not null;unique"`
-	CreatedBy User       `gorm:"foreignKey:CreatedBy;index"`
-	UpdatedBy User       `gorm:"foreignKey:UpdatedBy;index"`
+	CreatedBy uuid.UUID  `gorm:"type:uuid;not null;index"`
+	UpdatedBy uuid.UUID  `gorm:"type:uuid;not null;index"`
 	CreatedAt *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
-	UpdatedAt *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;index"`
+	UpdatedAt *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
 	DeletedAt gorm.DeletedAt
+
+	UserCreatedBy User `gorm:"foreignKey:CreatedBy"`
+	UserUpdatedBy User `gorm:"foreignKey:UpdatedBy"`
 }
 
 // CreatePermission creates a new permission
@@ -37,7 +40,8 @@ func (p *Permission) DeletePermission() error {
 // GetPermissionByID retrieves a permission by ID
 func GetPermissionByID(id uuid.UUID) (*Permission, error) {
 	var permission Permission
-	if err := stores.GetDb().First(&permission, "id = ?", id).Error; err != nil {
+	// Preload the associated UserCreatedBy and UserUpdatedBy relationships
+	if err := stores.GetDb().Preload("UserCreatedBy").Preload("UserUpdatedBy").First(&permission, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
 	return &permission, nil

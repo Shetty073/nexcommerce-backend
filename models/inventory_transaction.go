@@ -1,6 +1,7 @@
 package models
 
 import (
+	"nexcommerce/constants/enums"
 	"nexcommerce/stores"
 	"time"
 
@@ -9,16 +10,21 @@ import (
 )
 
 type InventoryTransaction struct {
-	ID        uuid.UUID  `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
-	Status    string     `gorm:"type:enum('in', 'out', 'adjustment');not null;index"`
-	Quantity  int        `gorm:"type:int;not null"`
-	Product   Product    `gorm:"foreignKey:ProductID;index"`
-	Warehouse Warehouse  `gorm:"foreignKey:WarehouseID;index"`
-	CreatedBy User       `gorm:"foreignKey:CreatedBy;index"`
-	UpdatedBy User       `gorm:"foreignKey:UpdatedBy;index"`
-	CreatedAt *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
-	UpdatedAt *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;index"`
-	DeletedAt gorm.DeletedAt
+	ID          uuid.UUID                        `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
+	Status      enums.InventoryTransactionStatus `gorm:"type:varchar(15);index"`
+	Quantity    int                              `gorm:"type:int;not null"`
+	ProductID   uuid.UUID                        `gorm:"type:uuid;not null;index"`
+	WarehouseID uuid.UUID                        `gorm:"type:uuid;not null;index"`
+	CreatedByID uuid.UUID                        `gorm:"type:uuid;not null;index"`
+	UpdatedByID uuid.UUID                        `gorm:"type:uuid;index"`
+	CreatedAt   *time.Time                       `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
+	UpdatedAt   *time.Time                       `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
+	DeletedAt   gorm.DeletedAt
+
+	Product   Product   `gorm:"foreignKey:ProductID"`
+	Warehouse Warehouse `gorm:"foreignKey:WarehouseID"`
+	CreatedBy User      `gorm:"foreignKey:CreatedByID"`
+	UpdatedBy User      `gorm:"foreignKey:UpdatedByID"`
 }
 
 // Receiver Methods
@@ -37,7 +43,7 @@ func (it *InventoryTransaction) Delete() error {
 // GetInventoryTransactionByID retrieves inventory transaction by ID
 func GetInventoryTransactionByID(id uuid.UUID) (*InventoryTransaction, error) {
 	var it InventoryTransaction
-	if err := stores.GetDb().First(&it, "id = ?", id).Error; err != nil {
+	if err := stores.GetDb().Preload("Product").Preload("Warehouse").Preload("CreatedBy").Preload("UpdatedBy").First(&it, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
 	return &it, nil

@@ -9,14 +9,18 @@ import (
 )
 
 type Logistics struct {
-	ID             uuid.UUID  `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	ID             uuid.UUID  `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	TrackingNumber string     `gorm:"type:varchar(50);not null;index"`
-	SalesOrder     SalesOrder `gorm:"foreignKey:SalesOrderID;index"`
-	CreatedBy      User       `gorm:"foreignKey:CreatedBy;index"`
-	UpdatedBy      User       `gorm:"foreignKey:UpdatedBy;index"`
+	SalesOrderID   uuid.UUID  `gorm:"type:uuid;not null;index"`
+	CreatedByID    uuid.UUID  `gorm:"type:uuid;not null;index"`
+	UpdatedByID    uuid.UUID  `gorm:"type:uuid;index"`
 	CreatedAt      *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
-	UpdatedAt      *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;index"`
+	UpdatedAt      *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
 	DeletedAt      gorm.DeletedAt
+
+	SalesOrder SalesOrder `gorm:"foreignKey:SalesOrderID"`
+	CreatedBy  User       `gorm:"foreignKey:CreatedByID"`
+	UpdatedBy  User       `gorm:"foreignKey:UpdatedByID"`
 }
 
 // Receiver Methods
@@ -35,7 +39,7 @@ func (l *Logistics) Delete() error {
 // GetLogisticsByID retrieves logistics by ID
 func GetLogisticsByID(id uuid.UUID) (*Logistics, error) {
 	var l Logistics
-	if err := stores.GetDb().First(&l, "id = ?", id).Error; err != nil {
+	if err := stores.GetDb().Preload("SalesOrder").Preload("CreatedBy").Preload("UpdatedBy").First(&l, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
 	return &l, nil

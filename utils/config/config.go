@@ -16,9 +16,12 @@ type Config struct {
 		Secret string `yaml:"secret"`
 	}
 	Stores struct {
-		MySql struct {
+		Postgres struct {
 			ConnectionString string `yaml:"connection_string"`
 		}
+	}
+	Auth struct {
+		TokenValidityInHrs int `yaml:"token_validity_in_hrs"`
 	}
 }
 

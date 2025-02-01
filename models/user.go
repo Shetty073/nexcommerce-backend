@@ -1,6 +1,7 @@
 package models
 
 import (
+	"nexcommerce/constants/enums"
 	"nexcommerce/stores"
 	"time"
 
@@ -9,21 +10,21 @@ import (
 )
 
 type User struct {
-	ID           uuid.UUID  `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
-	Username     string     `gorm:"unique;not null;index"`
-	Email        string     `gorm:"unique;not null;index"`
-	Password     string     `gorm:"not null"`
-	FirstName    string     `gorm:"type:varchar(50)"`
-	LastName     string     `gorm:"type:varchar(50)"`
-	DateOfBirth  string     `gorm:"type:date"`
-	Gender       string     `gorm:"type:varchar(12)"`
-	MobileNumber string     `gorm:"type:varchar(15);index"`
-	IsStaff      bool       `gorm:"default:false;index"`
-	IsCustomer   bool       `gorm:"default:false;index"`
-	LastLoginAt  *time.Time `gorm:"type:timestamp;index"`
-	Status       string     `gorm:"type:enum('active','inactive','banned');default:'active';index"`
-	CreatedAt    *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
-	UpdatedAt    *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;index"`
+	ID           uuid.UUID        `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
+	Username     string           `gorm:"unique;not null;index"`
+	Email        string           `gorm:"unique;not null;index"`
+	Password     string           `gorm:"not null"`
+	FirstName    string           `gorm:"type:varchar(50)"`
+	LastName     string           `gorm:"type:varchar(50)"`
+	DateOfBirth  string           `gorm:"type:date"`
+	Gender       string           `gorm:"type:varchar(12)"`
+	MobileNumber string           `gorm:"type:varchar(15);index"`
+	IsStaff      bool             `gorm:"default:false;index"`
+	IsCustomer   bool             `gorm:"default:false;index"`
+	LastLoginAt  *time.Time       `gorm:"type:timestamp;index"`
+	Status       enums.UserStatus `gorm:"type:varchar(15);index"`
+	CreatedAt    *time.Time       `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
+	UpdatedAt    *time.Time       `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
 	DeletedAt    gorm.DeletedAt
 }
 
@@ -61,22 +62,25 @@ func GetAllUsers() ([]User, error) {
 	return users, nil
 }
 
-// GetUserByEmail retrieves a user by email
-func GetUserByEmail(email string) (*User, error) {
-	var user User
-	if err := stores.GetDb().Where("email = ?", email).First(&user).Error; err != nil {
-		return nil, err
-	}
-	return &user, nil
-}
+// GetUserByEmailOrUsername retrieves a user by email or username
+func GetUserByEmailOrUsername(email, username string, user *User) error {
+	db := stores.GetDb()
 
-// GetUserByUsername retrieves a user by username
-func GetUserByUsername(username string) (*User, error) {
-	var user User
-	if err := stores.GetDb().Where("username = ?", username).First(&user).Error; err != nil {
-		return nil, err
+	if email != "" {
+		err := db.Where("email = ?", email).First(user).Error
+		if err == nil {
+			return nil
+		}
 	}
-	return &user, nil
+
+	if username != "" {
+		err := db.Where("username = ?", username).First(user).Error
+		if err == nil {
+			return nil
+		}
+	}
+
+	return gorm.ErrRecordNotFound
 }
 
 // GetAllSupportTickets retrieves all support tickets for a user, regardless of role (customer, assigned, etc.)

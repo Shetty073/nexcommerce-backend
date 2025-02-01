@@ -9,7 +9,7 @@ import (
 )
 
 type Supplier struct {
-	ID          uuid.UUID  `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	ID          uuid.UUID  `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	Name        string     `gorm:"type:varchar(100);not null;index"`
 	Description string     `gorm:"type:varchar(250)"`
 	Phone       string     `gorm:"type:varchar(15);index"`
@@ -19,11 +19,14 @@ type Supplier struct {
 	District    string     `gorm:"type:varchar(100)"`
 	State       string     `gorm:"type:varchar(100)"`
 	Country     string     `gorm:"type:varchar(100);index"`
-	CreatedBy   User       `gorm:"foreignKey:CreatedBy;index"`
-	UpdatedBy   User       `gorm:"foreignKey:UpdatedBy;index"`
+	CreatedByID uuid.UUID  `gorm:"type:uuid;not null;index"`
+	UpdatedByID uuid.UUID  `gorm:"type:uuid;index"`
 	CreatedAt   *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
-	UpdatedAt   *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;index"`
+	UpdatedAt   *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
 	DeletedAt   gorm.DeletedAt
+
+	CreatedBy User `gorm:"foreignKey:CreatedByID"`
+	UpdatedBy User `gorm:"foreignKey:UpdatedByID"`
 }
 
 // Receiver Methods
@@ -42,7 +45,7 @@ func (s *Supplier) Delete() error {
 // GetSupplierByID retrieves a supplier by ID
 func GetSupplierByID(id uuid.UUID) (*Supplier, error) {
 	var supplier Supplier
-	if err := stores.GetDb().First(&supplier, "id = ?", id).Error; err != nil {
+	if err := stores.GetDb().Preload("CreatedBy").Preload("UpdatedBy").First(&supplier, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
 	return &supplier, nil

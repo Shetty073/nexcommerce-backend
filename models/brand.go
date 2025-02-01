@@ -9,16 +9,19 @@ import (
 )
 
 type Brand struct {
-	ID          uuid.UUID  `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	ID          uuid.UUID  `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	Name        string     `gorm:"type:varchar(150);not null;unique;index"`
 	LogoImg     string     `gorm:"type:varchar(1024)"`
 	BannerImg   string     `gorm:"type:varchar(1024)"`
 	Description string     `gorm:"type:varchar(1000)"`
-	CreatedBy   User       `gorm:"foreignKey:CreatedBy;index"`
-	UpdatedBy   User       `gorm:"foreignKey:UpdatedBy;index"`
+	CreatedBy   uuid.UUID  `gorm:"type:uuid;not null;index"`
+	UpdatedBy   uuid.UUID  `gorm:"type:uuid;index"`
 	CreatedAt   *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
-	UpdatedAt   *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;index"`
+	UpdatedAt   *time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;index"`
 	DeletedAt   gorm.DeletedAt
+
+	CreatedByUser User `gorm:"foreignKey:CreatedBy"`
+	UpdatedByUser User `gorm:"foreignKey:UpdatedBy"`
 }
 
 // CreateBrand creates a new brand
@@ -40,8 +43,7 @@ func (b *Brand) DeleteBrand() error {
 // GetBrand retrieves a brand by its ID
 func (b *Brand) GetBrand(id uuid.UUID) (*Brand, error) {
 	var brand Brand
-	err := stores.GetDb().First(&brand, "id = ?", id).Error
-	if err != nil {
+	if err := stores.GetDb().Preload("CreatedByUser").Preload("UpdatedByUser").First(&brand, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
 	return &brand, nil
