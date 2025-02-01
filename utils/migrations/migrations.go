@@ -46,8 +46,7 @@ func RegisterAllModels() {
 	// Iterate through all models registered in the AllModels slice and auto-migrate them
 	for _, model := range modelTypes {
 		if err := stores.GetDb().AutoMigrate(model); err != nil {
-			// log.Fatalf("Failed to auto-migrate model %v: %v", model, err)
-			logger.Logger.Println("Starting server in release mode")
+			logger.Logger.Fatalf("Failed to auto-migrate model %v: %v", model, err)
 		}
 	}
 }
