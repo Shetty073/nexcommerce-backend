@@ -12,6 +12,16 @@ import (
 )
 
 // RegisterController handles user registration
+// @Summary Register a new user
+// @Description Creates a new user with the provided details
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body schemas.RegisterSchema true "User registration data"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /register [post]
 func RegisterController(c *gin.Context) {
 	var input schemas.RegisterSchema
 
@@ -52,6 +62,17 @@ func RegisterController(c *gin.Context) {
 }
 
 // LoginController handles user authentication
+// @Summary User login
+// @Description Authenticates a user with email/username and password, and returns a JWT token
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body schemas.LoginSchema true "User login data"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /login [post]
 func LoginController(c *gin.Context) {
 	var input schemas.LoginSchema
 
