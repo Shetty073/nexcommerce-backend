@@ -13,6 +13,7 @@ type Currency struct {
 	Name                string     `gorm:"type:varchar(20);not null;index"`
 	Symbol              string     `gorm:"type:varchar(5);index"`
 	ShortCode           string     `gorm:"type:varchar(5);index"`
+	Country             string     `gorm:"type:varchar(100);index"`
 	DollarExchangeValue float64    `gorm:"type:decimal"`
 	CreatedBy           uuid.UUID  `gorm:"type:uuid;not null;index"`
 	UpdatedBy           uuid.UUID  `gorm:"type:uuid;index"`
