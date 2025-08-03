@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     # ==== Your .env variables ====
     debug: bool = Field(False, env="DEBUG")
     database_url: str = Field(..., env="DATABASE_URL")
+    jwt_secret: str = Field(..., env="JWT_SECRET")
 
     # ==== Additional values coming from yaml ====
     project_name: str = "NexCommerce"
